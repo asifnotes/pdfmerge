@@ -3,245 +3,113 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Responsive PDF Merger</title>
+    <title>Responsive PDF & Image Merger</title>
     <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
     <style>
-        * {
-          box-sizing: border-box;
-        }
-
-        body {
-          font-family: 'Segoe UI', sans-serif;
-          background-color: #f0f2f5;
-          margin: 0;
-          padding: 20px;
-          text-align: center;
-        }
-
-        .container {
-          max-width: 960px;
-          margin: auto;
-          padding: 20px;
-        }
-
-        h1 {
-          margin-bottom: 20px;
-          font-size: 2rem;
-        }
-
-        .drop-zone {
-          border: 2px dashed #007bff;
-          background: #e9ecef;
-          padding: 30px;
-          border-radius: 12px;
-          margin-bottom: 20px;
-          cursor: pointer;
-          transition: background-color 0.3s;
-        }
-
-        .drop-zone:hover {
-          background: #dbe5f1;
-        }
-
-        input[type="file"] {
-          display: none;
-        }
-
-        ul {
-          list-style: none;
-          padding: 0;
-          text-align: left;
-          max-width: 100%;
-          margin: auto;
-        }
-
-        li {
-          background: #fff;
-          margin: 5px 0;
-          padding: 10px;
-          border-radius: 6px;
-          box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
-          font-size: 1rem;
-        }
-
-        button {
-          background-color: #28a745;
-          color: white;
-          padding: 14px 30px;
-          border: none;
-          font-size: 1.1rem;
-          font-weight: bold;
-          border-radius: 10px;
-          cursor: pointer;
-          width: 100%;
-          max-width: 300px;
-          margin-top: 20px;
-        }
-
-        button:hover {
-          background-color: #218838;
-        }
-
-        #status {
-          margin-top: 15px;
-          color: #333;
-          font-weight: bold;
-          font-size: 1rem;
-        }
-
-        /* ===========================
-           📱 Mobile View: 320px–480px
-        ============================ */
-        @media (max-width: 480px) {
-          h1 {
-            font-size: 1.4rem;
-          }
-
-          .drop-zone {
-            padding: 20px;
-            font-size: 0.95rem;
-          }
-
-          button {
-            font-size: 1rem;
-            padding: 12px 20px;
-          }
-
-          li {
-            font-size: 0.9rem;
-          }
-        }
-
-        /* ===========================
-           📱 Tablet View: 600px–1024px
-        ============================ */
-        @media (min-width: 600px) and (max-width: 1024px) {
-          h1 {
-            font-size: 1.8rem;
-          }
-
-          .drop-zone {
-            padding: 25px;
-            font-size: 1rem;
-          }
-
-          button {
-            font-size: 1.05rem;
-          }
-
-          li {
-            font-size: 1rem;
-          }
-        }
-
-        /* ===========================
-           💻 Desktop View: 1025px+
-        ============================ */
-        @media (min-width: 1025px) {
-          h1 {
-            font-size: 2rem;
-          }
-
-          .drop-zone {
-            padding: 30px;
-            font-size: 1.05rem;
-          }
-
-          button {
-            font-size: 1.15rem;
-          }
-
-          li {
-            font-size: 1.05rem;
-          }
-        }
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; text-align: center; }
+        .container { max-width: 960px; margin: auto; padding: 20px; }
+        h1 { margin-bottom: 20px; font-size: 2rem; }
+        .drop-zone { border: 2px dashed #007bff; background: #e9ecef; padding: 30px; border-radius: 12px; margin-bottom: 20px; cursor: pointer; transition: background-color 0.3s; }
+        .drop-zone:hover { background: #dbe5f1; }
+        input[type="file"] { display: none; }
+        ul { list-style: none; padding: 0; text-align: left; max-width: 100%; margin: auto; }
+        li { background: #fff; margin: 5px 0; padding: 10px; border-radius: 6px; box-shadow: 0 0 3px rgba(0, 0, 0, 0.1); font-size: 1rem; }
+        button { background-color: #28a745; color: white; padding: 14px 30px; border: none; font-size: 1.1rem; font-weight: bold; border-radius: 10px; cursor: pointer; width: 100%; max-width: 300px; margin-top: 10px; }
+        button:hover { background-color: #218838; }
+        #status { margin-top: 15px; color: #333; font-weight: bold; font-size: 1rem; }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>PDF Merger (Sorted A–Z by Filename)</h1>
-
-    <div class="drop-zone" id="dropZone">
+    <h1>PDF Merger (Sorted A–Z)</h1>
+    <div class="drop-zone" id="dropZonePDF">
         Drag & drop PDF files here or tap to select
         <input type="file" id="pdfs" accept="application/pdf" multiple />
     </div>
-
-    <ul id="fileList"></ul>
-
+    <ul id="fileListPDF"></ul>
     <button onclick="mergePDFs()">Merge & Download PDF</button>
+    <hr />
+    <h1>Image Merger (to PDF)</h1>
+    <div class="drop-zone" id="dropZoneImg">
+        Drag & drop images here or tap to select
+        <input type="file" id="images" accept="image/*" multiple />
+    </div>
+    <ul id="fileListImg"></ul>
+    <button onclick="mergeImages()">Merge Images & Download PDF</button>
     <div id="status"></div>
 </div>
 
 <script>
-    const input = document.getElementById("pdfs");
-    const dropZone = document.getElementById("dropZone");
-    const fileList = document.getElementById("fileList");
-    const status = document.getElementById("status");
+    // PDF merging
+    const pdfInput = document.getElementById('pdfs');
+    const pdfDrop = document.getElementById('dropZonePDF');
+    const pdfList = document.getElementById('fileListPDF');
     let pdfFiles = [];
-
-    dropZone.addEventListener("click", () => input.click());
-
-    dropZone.addEventListener("dragover", e => {
-      e.preventDefault();
-      dropZone.style.backgroundColor = "#d0e2ff";
-    });
-
-    dropZone.addEventListener("dragleave", () => {
-      dropZone.style.backgroundColor = "#e9ecef";
-    });
-
-    dropZone.addEventListener("drop", e => {
-      e.preventDefault();
-      dropZone.style.backgroundColor = "#e9ecef";
-      handleFiles(e.dataTransfer.files);
-    });
-
-    input.addEventListener("change", () => handleFiles(input.files));
-
-    function handleFiles(files) {
-      for (let file of files) {
-        if (file.type === "application/pdf") {
-          pdfFiles.push(file);
-        }
-      }
-      updateFileList();
+    pdfDrop.addEventListener('click', () => pdfInput.click());
+    pdfDrop.addEventListener('dragover', e => { e.preventDefault(); pdfDrop.style.backgroundColor = '#d0e2ff'; });
+    pdfDrop.addEventListener('dragleave', () => { pdfDrop.style.backgroundColor = '#e9ecef'; });
+    pdfDrop.addEventListener('drop', e => { e.preventDefault(); pdfDrop.style.backgroundColor = '#e9ecef'; handlePDFs(e.dataTransfer.files); });
+    pdfInput.addEventListener('change', () => handlePDFs(pdfInput.files));
+    function handlePDFs(files) {
+        for (let f of files) if (f.type === 'application/pdf') pdfFiles.push(f);
+        updatePDFList();
     }
-
-    function updateFileList() {
-      pdfFiles.sort((a, b) => a.name.localeCompare(b.name));
-      fileList.innerHTML = "";
-      pdfFiles.forEach((file) => {
-        const li = document.createElement("li");
-        li.textContent = file.name;
-        fileList.appendChild(li);
-      });
+    function updatePDFList() {
+        pdfFiles.sort((a,b)=>a.name.localeCompare(b.name)); pdfList.innerHTML='';
+        pdfFiles.forEach(f=>{let li=document.createElement('li'); li.textContent=f.name; pdfList.appendChild(li);});
     }
-
     async function mergePDFs() {
-      if (pdfFiles.length < 2) {
-        alert("Please upload at least two PDF files.");
-        return;
-      }
+        if (pdfFiles.length<2) { alert('Upload at least two PDFs.'); return; }
+        status.textContent='Merging PDFs...';
+        const merged = await PDFLib.PDFDocument.create();
+        for (let file of pdfFiles) {
+            const buf=await file.arrayBuffer();
+            const doc=await PDFLib.PDFDocument.load(buf);
+            const pages=await merged.copyPages(doc, doc.getPageIndices()); pages.forEach(p=>merged.addPage(p));
+        }
+        const bytes=await merged.save(); download(bytes,'merged.pdf'); status.textContent='PDF merged!';
+    }
 
-      status.textContent = "Merging PDFs, please wait...";
+    // Image to PDF merging
+    const imgInput = document.getElementById('images');
+    const imgDrop = document.getElementById('dropZoneImg');
+    const imgList = document.getElementById('fileListImg');
+    let imgFiles = [];
+    imgDrop.addEventListener('click', () => imgInput.click());
+    imgDrop.addEventListener('dragover', e => { e.preventDefault(); imgDrop.style.backgroundColor = '#d0e2ff'; });
+    imgDrop.addEventListener('dragleave', () => { imgDrop.style.backgroundColor = '#e9ecef'; });
+    imgDrop.addEventListener('drop', e => { e.preventDefault(); imgDrop.style.backgroundColor = '#e9ecef'; handleImgs(e.dataTransfer.files); });
+    imgInput.addEventListener('change', () => handleImgs(imgInput.files));
+    function handleImgs(files) {
+        for (let f of files) if (f.type.startsWith('image/')) imgFiles.push(f);
+        updateImgList();
+    }
+    function updateImgList() {
+        imgFiles.sort((a,b)=>a.name.localeCompare(b.name)); imgList.innerHTML='';
+        imgFiles.forEach(f=>{let li=document.createElement('li'); li.textContent=f.name; imgList.appendChild(li);});
+    }
+    async function mergeImages() {
+        if (imgFiles.length<1) { alert('Upload at least one image.'); return; }
+        status.textContent='Converting images to PDF...';
+        const pdfDoc = await PDFLib.PDFDocument.create();
+        for (let file of imgFiles) {
+            const buf=await file.arrayBuffer();
+            let img, dims;
+            if (file.type==='image/png') img=await pdfDoc.embedPng(buf);
+            else img=await pdfDoc.embedJpg(buf);
+            dims=img.scale(1);
+            const page=pdfDoc.addPage([dims.width,dims.height]);
+            page.drawImage(img,{x:0,y:0,width:dims.width,height:dims.height});
+        }
+        const bytes=await pdfDoc.save(); download(bytes,'images.pdf'); status.textContent='Images merged!';
+    }
 
-      const mergedPdf = await PDFLib.PDFDocument.create();
-
-      for (let file of pdfFiles) {
-        const bytes = await file.arrayBuffer();
-        const pdf = await PDFLib.PDFDocument.load(bytes);
-        const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
-        pages.forEach(page => mergedPdf.addPage(page));
-      }
-
-      const mergedPdfBytes = await mergedPdf.save();
-      const blob = new Blob([mergedPdfBytes], { type: "application/pdf" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "merged.pdf";
-      link.click();
-
-      status.textContent = "✅ Merged PDF downloaded successfully!";
+    // helper
+    function download(data, name) {
+        const blob=new Blob([data],{type:'application/pdf'});
+        const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+        a.download=name; a.click();
     }
 </script>
 </body>
