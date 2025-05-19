@@ -6,172 +6,51 @@
     <title>Responsive PDF Merger</title>
     <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
     <style>
-        * {
-          box-sizing: border-box;
-        }
-
-        body {
-          font-family: 'Segoe UI', sans-serif;
-          background-color: #f0f2f5;
-          margin: 0;
-          padding: 20px;
-          text-align: center;
-        }
-
-        .container {
-          max-width: 960px;
-          margin: auto;
-          padding: 20px;
-        }
-
-        h1 {
-          margin-bottom: 20px;
-          font-size: 2rem;
-        }
-
-        .drop-zone {
-          border: 2px dashed #007bff;
-          background: #e9ecef;
-          padding: 30px;
-          border-radius: 12px;
-          margin-bottom: 20px;
-          cursor: pointer;
-          transition: background-color 0.3s;
-        }
-
-        .drop-zone:hover {
-          background: #dbe5f1;
-        }
-
-        input[type="file"] {
-          display: none;
-        }
-
-        ul {
-          list-style: none;
-          padding: 0;
-          text-align: left;
-          max-width: 100%;
-          margin: auto;
-        }
-
-        li {
-          background: #fff;
-          margin: 5px 0;
-          padding: 10px;
-          border-radius: 6px;
-          box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
-          font-size: 1rem;
-        }
-
-        button {
-          background-color: #28a745;
-          color: white;
-          padding: 14px 30px;
-          border: none;
-          font-size: 1.1rem;
-          font-weight: bold;
-          border-radius: 10px;
-          cursor: pointer;
-          width: 100%;
-          max-width: 300px;
-          margin-top: 20px;
-        }
-
-        button:hover {
-          background-color: #218838;
-        }
-
-        #status {
-          margin-top: 15px;
-          color: #333;
-          font-weight: bold;
-          font-size: 1rem;
-        }
-
-        /* ===========================
-           📱 Mobile View: 320px–480px
-        ============================ */
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; text-align: center; }
+        .container { max-width: 960px; margin: auto; padding: 20px; }
+        h1 { margin-bottom: 20px; font-size: 2rem; }
+        .drop-zone { border: 2px dashed #007bff; background: #e9ecef; padding: 30px; border-radius: 12px; margin-bottom: 20px; cursor: pointer; transition: background-color 0.3s; }
+        .drop-zone:hover { background: #dbe5f1; }
+        input[type="file"] { display: none; }
+        ul { list-style: none; padding: 0; text-align: left; max-width: 100%; margin: auto; }
+        li { display: flex; justify-content: space-between; align-items: center; background: #fff; margin: 5px 0; padding: 10px; border-radius: 6px; box-shadow: 0 0 3px rgba(0,0,0,0.1); font-size: 1rem; }
+        .remove-btn { background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: #dc3545; }
+        .remove-btn:hover { color: #a71d2a; }
+        button.merge-btn { background-color: #28a745; color: white; padding: 14px 30px; border: none; font-size: 1.1rem; font-weight: bold; border-radius: 10px; cursor: pointer; width: 100%; max-width: 300px; margin-top: 20px; }
+        button.merge-btn:hover { background-color: #218838; }
+        #status { margin-top: 15px; color: #333; font-weight: bold; font-size: 1rem; }
         @media (max-width: 480px) {
-          h1 {
-            font-size: 1.4rem;
-          }
-
-          .drop-zone {
-            padding: 20px;
-            font-size: 0.95rem;
-          }
-
-          button {
-            font-size: 1rem;
-            padding: 12px 20px;
-          }
-
-          li {
-            font-size: 0.9rem;
-          }
+          h1 { font-size: 1.4rem; }
+          .drop-zone { padding: 20px; font-size: 0.95rem; }
+          button.merge-btn { font-size: 1rem; padding: 12px 20px; }
+          li { font-size: 0.9rem; }
         }
-
-        /* ===========================
-           📱 Tablet View: 600px–1024px
-        ============================ */
         @media (min-width: 600px) and (max-width: 1024px) {
-          h1 {
-            font-size: 1.8rem;
-          }
-
-          .drop-zone {
-            padding: 25px;
-            font-size: 1rem;
-          }
-
-          button {
-            font-size: 1.05rem;
-          }
-
-          li {
-            font-size: 1rem;
-          }
+          h1 { font-size: 1.8rem; }
+          .drop-zone { padding: 25px; font-size: 1rem; }
+          button.merge-btn { font-size: 1.05rem; }
+          li { font-size: 1rem; }
         }
-
-        /* ===========================
-           💻 Desktop View: 1025px+
-        ============================ */
         @media (min-width: 1025px) {
-          h1 {
-            font-size: 2rem;
-          }
-
-          .drop-zone {
-            padding: 30px;
-            font-size: 1.05rem;
-          }
-
-          button {
-            font-size: 1.15rem;
-          }
-
-          li {
-            font-size: 1.05rem;
-          }
+          h1 { font-size: 2rem; }
+          .drop-zone { padding: 30px; font-size: 1.05rem; }
+          button.merge-btn { font-size: 1.15rem; }
+          li { font-size: 1.05rem; }
         }
     </style>
 </head>
 <body>
 <div class="container">
     <h1>PDF Merger (Sorted A–Z by Filename)</h1>
-
     <div class="drop-zone" id="dropZone">
         Drag & drop PDF files here or tap to select
         <input type="file" id="pdfs" accept="application/pdf" multiple />
     </div>
-
     <ul id="fileList"></ul>
-
-    <button onclick="mergePDFs()">Merge & Download PDF</button>
+    <button class="merge-btn" onclick="mergePDFs()">Merge & Download PDF</button>
     <div id="status"></div>
 </div>
-
 <script>
     const input = document.getElementById("pdfs");
     const dropZone = document.getElementById("dropZone");
@@ -180,22 +59,9 @@
     let pdfFiles = [];
 
     dropZone.addEventListener("click", () => input.click());
-
-    dropZone.addEventListener("dragover", e => {
-      e.preventDefault();
-      dropZone.style.backgroundColor = "#d0e2ff";
-    });
-
-    dropZone.addEventListener("dragleave", () => {
-      dropZone.style.backgroundColor = "#e9ecef";
-    });
-
-    dropZone.addEventListener("drop", e => {
-      e.preventDefault();
-      dropZone.style.backgroundColor = "#e9ecef";
-      handleFiles(e.dataTransfer.files);
-    });
-
+    dropZone.addEventListener("dragover", e => { e.preventDefault(); dropZone.style.backgroundColor = "#d0e2ff"; });
+    dropZone.addEventListener("dragleave", () => { dropZone.style.backgroundColor = "#e9ecef"; });
+    dropZone.addEventListener("drop", e => { e.preventDefault(); dropZone.style.backgroundColor = "#e9ecef"; handleFiles(e.dataTransfer.files); });
     input.addEventListener("change", () => handleFiles(input.files));
 
     function handleFiles(files) {
@@ -205,14 +71,24 @@
         }
       }
       updateFileList();
+      input.value = null; // allow re-selection of same file
     }
 
     function updateFileList() {
       pdfFiles.sort((a, b) => a.name.localeCompare(b.name));
-      fileList.innerHTML = "";
-      pdfFiles.forEach((file) => {
-        const li = document.createElement("li");
-        li.textContent = file.name;
+      fileList.innerHTML = '';
+      pdfFiles.forEach((file, index) => {
+        const li = document.createElement('li');
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = file.name;
+        const btn = document.createElement('button');
+        btn.innerHTML = '&times;';
+        btn.className = 'remove-btn';
+        btn.addEventListener('click', () => {
+          pdfFiles.splice(index, 1);
+          updateFileList();
+        });
+        li.append(nameSpan, btn);
         fileList.appendChild(li);
       });
     }
@@ -222,25 +98,20 @@
         alert("Please upload at least two PDF files.");
         return;
       }
-
       status.textContent = "Merging PDFs, please wait...";
-
       const mergedPdf = await PDFLib.PDFDocument.create();
-
       for (let file of pdfFiles) {
         const bytes = await file.arrayBuffer();
         const pdf = await PDFLib.PDFDocument.load(bytes);
         const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
         pages.forEach(page => mergedPdf.addPage(page));
       }
-
       const mergedPdfBytes = await mergedPdf.save();
       const blob = new Blob([mergedPdfBytes], { type: "application/pdf" });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
       link.download = "merged.pdf";
       link.click();
-
       status.textContent = "✅ Merged PDF downloaded successfully!";
     }
 </script>
